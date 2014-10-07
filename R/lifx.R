@@ -43,32 +43,36 @@ color <- function(selector="all", hue, saturation=1, brightness=1, duration=1){
 #' @param selector which lights should we toggle?
 #' @param duration time in seconds for how long should the light be green?
 #' @export
-success <- function(selector="all", duration=4){
+success <- function(selector="all", duration=Inf){
   current <- status(selector)
   color(selector, hue=120, saturation=1, brightness=1, duration=0.1) # duration is speed of change
-  Sys.sleep(duration)
-  # FIXME restores all bulbs to the property of the first bulb
-  color(selector, 
-        hue = current[[1]]$color[["hue"]], 
-        saturation = current[[1]]$color[["saturation"]],
-        brightness = current[[1]]$color[["brightness"]],
-        duration = 0.1)
+  if(duration < Inf){
+    Sys.sleep(duration)
+    # FIXME restores all bulbs to the property of the first bulb
+    color(selector, 
+          hue = current[[1]]$color[["hue"]], 
+          saturation = current[[1]]$color[["saturation"]],
+          brightness = current[[1]]$color[["brightness"]],
+          duration = 0.1)
+  }
 }
 
 #' Briefly set light(s) to red
 #' @param selector which lights should we toggle?
 #' @param duration time in seconds for how long should the light be green?
 #' @export
-fail <-  function(selector="all", duration=4){
+fail <-  function(selector="all", duration=Inf){
   current <- status(selector)
   color(selector, hue=1, saturation=1, brightness=1, duration=0.1) # duration is speed of change
-  Sys.sleep(duration)
-  # FIXME restores all bulbs to the property of the first bulb
-  color(selector, 
-        hue = current[[1]]$color[["hue"]], 
-        saturation = current[[1]]$color[["saturation"]],
-        brightness = current[[1]]$color[["brightness"]],
-        duration = 0.1)
+  if(duration < Inf){
+    Sys.sleep(duration)
+    # FIXME restores all bulbs to the property of the first bulb
+    color(selector, 
+          hue = current[[1]]$color[["hue"]], 
+          saturation = current[[1]]$color[["saturation"]],
+          brightness = current[[1]]$color[["brightness"]],
+          duration = 0.1)
+  }
 }
 
 
