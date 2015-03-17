@@ -1,17 +1,16 @@
 Package: lifxr
 Title: Interface to the LIFX API
-Description: Simple interface to the LIFX lifx-http API,
-    https://github.com/chendo/lifx-http
-Version: 0.0-1
-License: MIT
-Author: Carl Boettiger
-Maintainer: Carl Boettiger, <cboettig@gmail.com>
+Version: 0.0-2
+Description: Simple interface to the LIFX cloud API, https://api.lifx.co
+License: CC0 
+Authors@R: person('Carl', 'Boettiger', email='cboettig@gmail.com', role = c('aut', 'cre'))
 URL: https://github.com/cboettig/lifxr
 BugReports: https://github.com/cboettig/lifxr/issues
 VignetteBuilder: knitr
-SystemRequirements: lifx-http server running on the local network
-Imports:
-    httr (>= 0.3)
-Suggests:
+Depends: R (>= 3.1.2)
+Imports: 
+    httr (>= 0.3),
+    RJSONIO
+Suggests: 
     knitr (>= 1.5),
     testthat
