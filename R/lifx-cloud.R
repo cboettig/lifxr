@@ -94,6 +94,7 @@ power <- function(state = c("on", "off"), selector = "all", duration = 1.0){
 #' @param duration the length of the effect
 #' @inheritParams lights
 #' @return httr response object
+#' @export
 off <-  function(selector = "all", duration = 1.0){
   power("off", selector = selector, duration = duration)
 }
@@ -105,6 +106,7 @@ off <-  function(selector = "all", duration = 1.0){
 #' @param duration the length of the effect
 #' @inheritParams lights
 #' @return httr response object
+#' @export
 on <- function(selector = "all", duration = 1.0){
   power("on", selector = selector, duration = duration)
 }
