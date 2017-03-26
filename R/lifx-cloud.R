@@ -1,17 +1,24 @@
 ## SEE Docs: https://api.lifx.com/
 
 BASE <- "https://api.lifx.com"
-VERSION <- "v1beta1"
+VERSION <- "v1"
+
+get_accesstoken <- function(){
+    key <- Sys.getenv("LIFX_PAT",unset = NA)
+    if(is.na(key))stop("No key found")
+    key
+    
+}
 
 #' ping
 #' 
 #' ping the lifx API and get a status reply
 #' @import httr
-#' @import RJSONIO
+#' @import jsonlite
 #' @export
 ping <- function(){
   results <- GET(paste0(BASE, "/", VERSION, "/lights.json"), 
-                 query = list(access_token = getOption("LIFX_PAT", "")))
+                 query = list(access_token = get_accesstoken()))
   if(results$status_code != 200)
     message("LIFX bulbs could not be reached")
   else
@@ -29,8 +36,8 @@ ping <- function(){
 #' @export
 lights <- function(selector = "all"){
   results <- GET(paste0(BASE, "/", VERSION, "/lights/", selector), 
-                 query = list(access_token = getOption("LIFX_PAT", "")))
-  RJSONIO::fromJSON(content(results, as="text"))
+                 query = list(access_token = get_accesstoken()))
+  jsonlite::fromJSON(content(results, as="text",encoding = "utf-8"),simplifyDataFrame = F)
 }
 
 #' current color
@@ -68,7 +75,7 @@ current_color <- function(selector = "all"){
 #' @export
 toggle <- function(selector = "all"){
   POST(paste0(BASE, "/", VERSION, "/lights/", selector, "/toggle.json"), 
-       query = list(access_token = getOption("LIFX_PAT", "")))
+       query = list(access_token = get_accesstoken()))
 }
 
 #' power
@@ -81,10 +88,10 @@ toggle <- function(selector = "all"){
 #' @details Not exported because it conflicts with stats::power. see on() and off()
 power <- function(state = c("on", "off"), selector = "all", duration = 1.0){
   state <- match.arg(state)
-  PUT(paste0(BASE, "/", VERSION, "/lights/", selector, "/power.json"), 
-      query = list(state = state, 
+  PUT(paste0(BASE, "/", VERSION, "/lights/", selector, "/state.json"), 
+      query = list(power = state, 
                    duration = duration, 
-                   access_token = getOption("LIFX_PAT", "")))
+                   access_token = get_accesstoken()))
 }
 
 
@@ -133,11 +140,11 @@ on <- function(selector = "all", duration = 1.0){
 #' @return httr response object
 #' @export
 color <- function(color, selector="all", duration = 1.0, power_on = TRUE){
-  PUT(paste0(BASE, "/", VERSION, "/lights/", selector, "/color.json"), 
+  PUT(paste0(BASE, "/", VERSION, "/lights/", selector, "/state.json"), 
       query = list(color = color, 
                    duration = duration, 
                    power_on = power_on,
-                   access_token = getOption("LIFX_PAT", "")))
+                   access_token = get_accesstoken()))
 }
 
 
@@ -154,7 +161,7 @@ color <- function(color, selector="all", duration = 1.0, power_on = TRUE){
 #' breathe("purple", "blue")
 #' }
 #' @export
-breathe <- function(color, from_color = current_color(selector)[[1]], 
+breathe <- function(color, from_color = current_color(selector), 
                     period = 10.0, cycles = 2, persist = FALSE,
                     peak = 0.5, selector="all", power_on = TRUE){
   settings <- list(color = color, 
@@ -164,8 +171,8 @@ breathe <- function(color, from_color = current_color(selector)[[1]],
                    persist = persist,
                    peak = peak,
                    power_on = power_on,
-                   access_token = getOption("LIFX_PAT", ""))
-  POST(paste0(BASE, "/", VERSION, "/lights/", selector, "/effects/breathe.json"),
+                   access_token = get_accesstoken())
+  POST(paste0(BASE, "/", VERSION, "/lights/", selector, "/effects/breathe"),
        query = settings)
 }
 
@@ -186,7 +193,7 @@ pulse <- function(color, from_color = current_color(selector)[[1]],
                    persist = persist,
                    duty_cycle = duty_cycle,
                    power_on = power_on,
-                   access_token = getOption("LIFX_PAT", ""))
+                   access_token = get_accesstoken())
   POST(paste0(BASE, "/", VERSION, "/lights/", selector, "/effects/pulse.json"),
        query = settings)
 }
@@ -201,7 +208,7 @@ pulse <- function(color, from_color = current_color(selector)[[1]],
 label <- function(label, selector) {
   PUT(paste0(BASE, "/", VERSION, "/lights/", selector, "/label.json"), 
       query = list(label = label, 
-                   access_token = getOption("LIFX_PAT", "")))
+                   access_token = get_accesstoken()))
 }
 
 #' scene
@@ -213,23 +220,35 @@ label <- function(label, selector) {
 #' @export
 scene <- function(state = c("on", "off"), scene_id, duration = 1.0){
   state <- match.arg(state)
-  PUT(paste0(BASE, "/", VERSION, "/scenes/scene_id:", scene_id, "/power.json"), 
+  PUT(paste0(BASE, "/", VERSION, "/scenes/scene_id:", scene_id, "/activate.json"), 
       query = list(state = state, 
                    duration = duration, 
-                   access_token = getOption("LIFX_PAT", "")))
+                   access_token = get_accesstoken()))
 }
+
+#' Lists all the scenes available in the users account
+#' 
+#' @return httr response object
+#' @export
+get_scenes <- function(){
+    results <- GET(paste0(BASE, "/", VERSION, "/scenes.json"),
+        query = list(access_token = get_accesstoken()))
+    jsonlite::fromJSON(content(results, as="text"))
+}
+
+
 
 #' parse color
 #'
 #' Parse a color string and return hue, saturation, brightness and kelvin values
 #' @param string The color string to parse
-#' @return hsbk information for the string. NOTE: This API endpoing appears not to be working yet! 
+#' @return hsbk information for the string. 
 #' @export
 parse_color <- function(string){
-  results <- PUT(paste0(BASE, "/", VERSION, "/color.json"), 
+  results <- GET(paste0(BASE, "/", VERSION, "/color"), 
                  query = list(string = string,
-                              access_token = getOption("LIFX_PAT", "")))
-  RJSONIO::fromJSON(content(results, as="text"))
+                              access_token = get_accesstoken()))
+  jsonlite::fromJSON(content(results, as="text"))
 }
 
 
