@@ -140,7 +140,7 @@ on <- function(selector = "all", duration = 1.0){
 #' @return httr response object
 #' @export
 color <- function(color, selector="all", duration = 1.0, power_on = TRUE){
-  PUT(paste0(BASE, "/", VERSION, "/lights/", selector, "/color.json"), 
+  PUT(paste0(BASE, "/", VERSION, "/lights/", selector, "/state.json"), 
       query = list(color = color, 
                    duration = duration, 
                    power_on = power_on,
@@ -161,7 +161,7 @@ color <- function(color, selector="all", duration = 1.0, power_on = TRUE){
 #' breathe("purple", "blue")
 #' }
 #' @export
-breathe <- function(color, from_color = current_color(selector)[[1]], 
+breathe <- function(color, from_color = current_color(selector), 
                     period = 10.0, cycles = 2, persist = FALSE,
                     peak = 0.5, selector="all", power_on = TRUE){
   settings <- list(color = color, 
@@ -172,7 +172,7 @@ breathe <- function(color, from_color = current_color(selector)[[1]],
                    peak = peak,
                    power_on = power_on,
                    access_token = get_accesstoken())
-  POST(paste0(BASE, "/", VERSION, "/lights/", selector, "/effects/breathe.json"),
+  POST(paste0(BASE, "/", VERSION, "/lights/", selector, "/effects/breathe"),
        query = settings)
 }
 
@@ -220,11 +220,23 @@ label <- function(label, selector) {
 #' @export
 scene <- function(state = c("on", "off"), scene_id, duration = 1.0){
   state <- match.arg(state)
-  PUT(paste0(BASE, "/", VERSION, "/scenes/scene_id:", scene_id, "/power.json"), 
+  PUT(paste0(BASE, "/", VERSION, "/scenes/scene_id:", scene_id, "/activate.json"), 
       query = list(state = state, 
                    duration = duration, 
                    access_token = get_accesstoken()))
 }
+
+#' Lists all the scenes available in the users account
+#' 
+#' @return httr response object
+#' @export
+get_scenes <- function(){
+    results <- GET(paste0(BASE, "/", VERSION, "/scenes.json"),
+        query = list(access_token = get_accesstoken()))
+    jsonlite::fromJSON(content(results, as="text"))
+}
+
+
 
 #' parse color
 #'
