@@ -14,7 +14,7 @@ get_accesstoken <- function(){
 #' 
 #' ping the lifx API and get a status reply
 #' @import httr
-#' @import RJSONIO
+#' @import jsonlite
 #' @export
 ping <- function(){
   results <- GET(paste0(BASE, "/", VERSION, "/lights.json"), 
@@ -37,7 +37,7 @@ ping <- function(){
 lights <- function(selector = "all"){
   results <- GET(paste0(BASE, "/", VERSION, "/lights/", selector), 
                  query = list(access_token = get_accesstoken()))
-  RJSONIO::fromJSON(content(results, as="text"))
+  jsonlite::fromJSON(content(results, as="text",encoding = "utf-8"),simplifyDataFrame = F)
 }
 
 #' current color
@@ -88,8 +88,8 @@ toggle <- function(selector = "all"){
 #' @details Not exported because it conflicts with stats::power. see on() and off()
 power <- function(state = c("on", "off"), selector = "all", duration = 1.0){
   state <- match.arg(state)
-  PUT(paste0(BASE, "/", VERSION, "/lights/", selector, "/power.json"), 
-      query = list(state = state, 
+  PUT(paste0(BASE, "/", VERSION, "/lights/", selector, "/state.json"), 
+      query = list(power = state, 
                    duration = duration, 
                    access_token = get_accesstoken()))
 }
@@ -236,7 +236,7 @@ parse_color <- function(string){
   results <- PUT(paste0(BASE, "/", VERSION, "/color.json"), 
                  query = list(string = string,
                               access_token = get_accesstoken()))
-  RJSONIO::fromJSON(content(results, as="text"))
+  jsonlite::fromJSON(content(results, as="text"))
 }
 
 

@@ -8,9 +8,9 @@ URL: https://github.com/cboettig/lifxr
 BugReports: https://github.com/cboettig/lifxr/issues
 VignetteBuilder: knitr
 Depends: R (>= 3.1.2)
-Imports: 
+Imports:
     httr (>= 0.3),
-    RJSONIO
-Suggests: 
+    jsonlite
+Suggests:
     knitr (>= 1.5),
     testthat
