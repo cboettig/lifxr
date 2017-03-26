@@ -1,7 +1,7 @@
 ## SEE Docs: https://api.lifx.com/
 
 BASE <- "https://api.lifx.com"
-VERSION <- "v1beta1"
+VERSION <- "v1"
 
 #' ping
 #' 
