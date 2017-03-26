@@ -242,10 +242,10 @@ get_scenes <- function(){
 #'
 #' Parse a color string and return hue, saturation, brightness and kelvin values
 #' @param string The color string to parse
-#' @return hsbk information for the string. NOTE: This API endpoing appears not to be working yet! 
+#' @return hsbk information for the string. 
 #' @export
 parse_color <- function(string){
-  results <- PUT(paste0(BASE, "/", VERSION, "/color.json"), 
+  results <- GET(paste0(BASE, "/", VERSION, "/color"), 
                  query = list(string = string,
                               access_token = get_accesstoken()))
   jsonlite::fromJSON(content(results, as="text"))
