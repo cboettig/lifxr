@@ -10,7 +10,7 @@ Quickstart
 Install the package:
 
 ``` r
-install.packages("lifxr", repos = c("http://cran.rstudio.com", "http://carlboettiger.info/drat"))
+devtools::install_github("cboettig/lifxr")
 ```
 
 Get your Personal Authentication Token from the LIFX cloud: [<https://cloud.lifx.com/settings>](https://cloud.lifx.com/settings). Add this token into R using `options()` in your `.Rprofile` or current session:
