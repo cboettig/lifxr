@@ -1,7 +1,7 @@
 ## SEE Docs: https://api.lifx.com/
 
 BASE <- "https://api.lifx.com"
-VERSION <- "v1beta1"
+VERSION <- "v1"
 
 #' ping
 #' 
@@ -81,8 +81,8 @@ toggle <- function(selector = "all"){
 #' @details Not exported because it conflicts with stats::power. see on() and off()
 power <- function(state = c("on", "off"), selector = "all", duration = 1.0){
   state <- match.arg(state)
-  PUT(paste0(BASE, "/", VERSION, "/lights/", selector, "/power.json"), 
-      query = list(state = state, 
+  PUT(paste0(BASE, "/", VERSION, "/lights/", selector, "/state.json"), 
+      query = list(power = state, 
                    duration = duration, 
                    access_token = getOption("LIFX_PAT", "")))
 }
@@ -133,10 +133,10 @@ on <- function(selector = "all", duration = 1.0){
 #' @return httr response object
 #' @export
 color <- function(color, selector="all", duration = 1.0, power_on = TRUE){
-  PUT(paste0(BASE, "/", VERSION, "/lights/", selector, "/color.json"), 
-      query = list(color = color, 
-                   duration = duration, 
-                   power_on = power_on,
+    PUT(paste0(BASE, "/", VERSION, "/lights/", selector, "/state.json"), 
+        query = list(color = color, 
+                     duration = duration, 
+                     power_on = power_on,
                    access_token = getOption("LIFX_PAT", "")))
 }
 
@@ -212,12 +212,22 @@ label <- function(label, selector) {
 #' @return httr response object
 #' @export
 scene <- function(state = c("on", "off"), scene_id, duration = 1.0){
-  state <- match.arg(state)
-  PUT(paste0(BASE, "/", VERSION, "/scenes/scene_id:", scene_id, "/power.json"), 
-      query = list(state = state, 
-                   duration = duration, 
+    state <- match.arg(state)
+    PUT(paste0(BASE, "/", VERSION, "/scenes/scene_id:", scene_id, "/activate.json"), 
+        query = list(state = state, 
+                     duration = duration, 
                    access_token = getOption("LIFX_PAT", "")))
 }
+#' Lists all the scenes available in the users account
+#' 
+#' @return httr response object
+#' @export
+get_scenes <- function(){
+    results <- GET(paste0(BASE, "/", VERSION, "/scenes.json"),
+                   query = list(access_token = getOption("LIFX_PAT", "")))
+    RJSONIO::fromJSON(content(results, as="text"))
+}
+
 
 #' parse color
 #'
@@ -226,8 +236,8 @@ scene <- function(state = c("on", "off"), scene_id, duration = 1.0){
 #' @return hsbk information for the string. NOTE: This API endpoing appears not to be working yet! 
 #' @export
 parse_color <- function(string){
-  results <- PUT(paste0(BASE, "/", VERSION, "/color.json"), 
-                 query = list(string = string,
+    results <- GET(paste0(BASE, "/", VERSION, "/color"), 
+                   query = list(string = string,
                               access_token = getOption("LIFX_PAT", "")))
   RJSONIO::fromJSON(content(results, as="text"))
 }
