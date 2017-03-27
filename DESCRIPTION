@@ -1,7 +1,7 @@
 Package: lifxr
 Title: Interface to the LIFX API
 Version: 0.0.2
-Description: Simple interface to the LIFX cloud API, https://api.lifx.com
+Description: Simple interface to the LIFX cloud API, https://api.lifx.com.
 License: CC0 
 Authors@R: person('Carl', 'Boettiger', email='cboettig@gmail.com', role = c('aut', 'cre'))
 URL: https://github.com/cboettig/lifxr
